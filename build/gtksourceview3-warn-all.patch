@@ -1,0 +1,24 @@
+diff -up gtksourceview-2.90.3/gtksourceview/Makefile.am.warn-all gtksourceview-2.90.3/gtksourceview/Makefile.am
+--- gtksourceview-2.90.3/gtksourceview/Makefile.am.warn-all	2010-06-29 10:34:54.121941117 -0400
++++ gtksourceview-2.90.3/gtksourceview/Makefile.am	2010-06-29 10:35:12.226690385 -0400
+@@ -166,7 +166,7 @@ if HAVE_INTROSPECTION
+ INTROSPECTION_GIRS = GtkSource-3.0.gir
+ 
+ GtkSource-3.0.gir: libgtksourceview-3.0.la
+-INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) --warn-all
++INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir)
+ GtkSource_3_0_gir_NAMESPACE = GtkSource
+ GtkSource_3_0_gir_VERSION = 3.0
+ GtkSource_3_0_gir_LIBS = libgtksourceview-3.0.la
+diff -up gtksourceview-2.90.3/gtksourceview/Makefile.in.warn-all gtksourceview-2.90.3/gtksourceview/Makefile.in
+--- gtksourceview-2.90.3/gtksourceview/Makefile.in.warn-all	2010-06-29 10:35:00.708940698 -0400
++++ gtksourceview-2.90.3/gtksourceview/Makefile.in	2010-06-29 10:35:19.929866024 -0400
+@@ -459,7 +459,7 @@ libgtksourcecompletionwords_files = \
+ 	./completion-providers/words/gtksourcecompletionwords.c
+ 
+ @HAVE_INTROSPECTION_TRUE@INTROSPECTION_GIRS = GtkSource-3.0.gir
+-@HAVE_INTROSPECTION_TRUE@INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) --warn-all
++@HAVE_INTROSPECTION_TRUE@INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir)
+ @HAVE_INTROSPECTION_TRUE@GtkSource_3_0_gir_NAMESPACE = GtkSource
+ @HAVE_INTROSPECTION_TRUE@GtkSource_3_0_gir_VERSION = 3.0
+ @HAVE_INTROSPECTION_TRUE@GtkSource_3_0_gir_LIBS = libgtksourceview-3.0.la

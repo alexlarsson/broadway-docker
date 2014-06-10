@@ -1,0 +1,22 @@
+--- gedit-3.8.1/configure.ac
++++ gedit-3.8.1/configure.ac
+@@ -34,7 +34,7 @@ PKG_PROG_PKG_CONFIG
+ # needed on osx
+ AC_PROG_OBJC
+ 
+-AM_PATH_PYTHON(3.2.3)
++AM_PATH_PYTHON
+ 
+ # Initialize libtool
+ LT_PREREQ([2.2.6])
+--- gedit-3.8.1/gedit/gedit-plugins-engine.c
++++ gedit-3.8.1/gedit/gedit-plugins-engine.c
+@@ -66,7 +66,7 @@ gedit_plugins_engine_init (GeditPluginsE
+ 	                                            GEDIT_TYPE_PLUGINS_ENGINE,
+ 	                                            GeditPluginsEnginePrivate);
+ 
+-	peas_engine_enable_loader (PEAS_ENGINE (engine), "python3");
++	peas_engine_enable_loader (PEAS_ENGINE (engine), "python");
+ 
+ 	engine->priv->plugin_settings = g_settings_new ("org.gnome.gedit.plugins");
+ 

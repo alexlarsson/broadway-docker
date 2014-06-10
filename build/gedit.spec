@@ -1,17 +1,5 @@
 %global _changelog_trimtime %(date +%s -d "1 year ago")
 
-%if 0%{?fedora} > 12
-%global with_zeitgeist 1
-%global with_python3 1
-%else
-%global with_zeitgeist 0
-%global with_python3 0
-%endif
-
-%if %{with_python3}
-%global __python %{__python3}
-%endif
-
 %define glib2_version 2.39.5
 %define gtk3_version 3.11.6
 %define pygo_version 3.0.0
@@ -20,7 +8,6 @@
 %define enchant_version 1.2.0
 %define isocodes_version 0.35
 %define libpeas_version 1.7.0
-%define zeitgeist_version 0.9.12
 
 Summary:	Text editor for the GNOME desktop
 Name:		gedit
@@ -32,12 +19,12 @@ Group:		Applications/Editors
 #VCS: git:git://git.gnome.org/gedit
 Source0:	http://download.gnome.org/sources/gedit/3.12/gedit-%{version}.tar.xz
 
+Patch1:         gedit-broadway.patch
+
 URL:		http://projects.gnome.org/gedit/
 
 Requires(post):         desktop-file-utils >= %{desktop_file_utils_version}
 Requires(postun):       desktop-file-utils >= %{desktop_file_utils_version}
-
-Patch4: gedit-disable-python3.patch
 
 BuildRequires: gnome-common
 BuildRequires: glib2-devel >= %{glib2_version}
@@ -48,7 +35,6 @@ BuildRequires: iso-codes-devel >= %{isocodes_version}
 BuildRequires: libattr-devel
 BuildRequires: gtksourceview3-devel >= %{gtksourceview_version}
 BuildRequires: gettext
-BuildRequires: pygobject3-devel
 BuildRequires: libpeas-devel >= %{libpeas_version}
 BuildRequires: gsettings-desktop-schemas-devel
 BuildRequires: which
@@ -57,24 +43,11 @@ BuildRequires: intltool
 BuildRequires: gobject-introspection-devel
 BuildRequires: yelp-tools
 BuildRequires: itstool
-BuildRequires: vala-tools
-%if %{with_python3}
-BuildRequires: python3-devel
-BuildRequires: python3-gobject >= %{pygo_version}
-%else
-BuildRequires: python-devel
-%endif
 
 Requires: glib2%{?_isa} >= %{glib2_version}
 Requires: gtk3%{?_isa} >= %{gtk3_version}
 Requires: gtksourceview3%{?_isa} >= %{gtksourceview_version}
-%if %{with_python3}
-Requires: python3-gobject >= %{pygo_version}
-%endif
-# the run-command plugin uses zenity
-Requires: zenity
 Requires: gsettings-desktop-schemas
-Requires: gvfs
 
 %description
 gedit is a small, but powerful text editor designed specifically for
@@ -101,25 +74,9 @@ to gedit.
 
 Install gedit-devel if you want to write plugins for gedit.
 
-%if %{with_zeitgeist}
-%package zeitgeist
-Summary: Zeitgeist plugin for gedit
-Group: Applications/Editors
-Requires: %{name} = %{epoch}:%{version}-%{release}
-Requires: zeitgeist >= %{zeitgeist_version}
-BuildRequires: zeitgeist-devel >= %{zeitgeist_version}
-
-%description zeitgeist
-This packages brings the Zeitgeist dataprovider - a plugin that logs
-access and leave event for documents used with gedit.
-%endif
-
 %prep
 %setup -q
-
-%if !%{with_python3}
-%patch4 -p1 -b .disable-python
-%endif
+%patch1 -p1 -b .broadway
 
 autoreconf -i -f
 intltoolize -f
@@ -127,12 +84,9 @@ intltoolize -f
 %build
 %configure \
 	--disable-gtk-doc \
+        --disable-vala \
 	--enable-introspection=yes \
-%if %{with_python3}
-	--enable-python=yes \
-%else
-	--enable-python=no \
-%endif
+        --disable-python \
 	--disable-updater \
 	--enable-gvfs-metadata
 make %{_smp_mflags}
@@ -170,10 +124,6 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 %{_datadir}/gedit
 %{_datadir}/applications/gedit.desktop
 %{_mandir}/man1/*
-%if %{with_python3}
-%{python3_sitearch}/gi/overrides/Gedit.py*
-%{python3_sitearch}/gi/overrides/__pycache__
-%endif
 %{_libexecdir}/gedit
 %{_libdir}/gedit/girepository-1.0
 %dir %{_libdir}/gedit
@@ -185,16 +135,6 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 %{_libdir}/gedit/plugins/libfilebrowser.so
 %{_libdir}/gedit/plugins/modelines.plugin
 %{_libdir}/gedit/plugins/libmodelines.so
-%if %{with_python3}
-%{_libdir}/gedit/plugins/externaltools.plugin
-%{_libdir}/gedit/plugins/externaltools
-%{_libdir}/gedit/plugins/pythonconsole.plugin
-%{_libdir}/gedit/plugins/pythonconsole
-%{_libdir}/gedit/plugins/quickopen.plugin
-%{_libdir}/gedit/plugins/quickopen
-%{_libdir}/gedit/plugins/snippets.plugin
-%{_libdir}/gedit/plugins/snippets
-%endif
 %{_libdir}/gedit/plugins/sort.plugin
 %{_libdir}/gedit/plugins/libsort.so
 %{_libdir}/gedit/plugins/spell.plugin
@@ -206,10 +146,6 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 %{_datadir}/GConf/gsettings
 %{_datadir}/glib-2.0/schemas/org.gnome.gedit.gschema.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.gedit.enums.xml
-%if %{with_python3}
-%{_datadir}/glib-2.0/schemas/org.gnome.gedit.plugins.externaltools.gschema.xml
-%{_datadir}/glib-2.0/schemas/org.gnome.gedit.plugins.pythonconsole.gschema.xml
-%endif
 %{_datadir}/glib-2.0/schemas/org.gnome.gedit.plugins.filebrowser.gschema.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.gedit.plugins.filebrowser.enums.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.gedit.plugins.time.gschema.xml
@@ -221,13 +157,6 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 %{_includedir}/gedit-3.12
 %{_libdir}/pkgconfig/gedit.pc
 %{_datadir}/gtk-doc
-%{_datadir}/vala/
-
-%if %{with_zeitgeist}
-%files zeitgeist
-%{_libdir}/gedit/plugins/zeitgeist.plugin
-%{_libdir}/gedit/plugins/libzeitgeist.so
-%endif
 
 %changelog
 * Tue Jun 10 2014 Alexander Larsson <alexl@redhat.com> - 2:3.12.2-2

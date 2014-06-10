@@ -97,13 +97,25 @@ RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gnome-terminal-3.*.rpm
 ADD gtksourceview3.spec /rpmbuild/SOURCES/
 ADD http://ftp.acc.umu.se/pub/gnome/sources/gtksourceview/3.12/gtksourceview-3.12.2.tar.xz /rpmbuild/SOURCES/
 RUN rpmbuild -ba /rpmbuild/SOURCES/gtksourceview3.spec
-RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gtksourceview3.*.rpm /rpmbuild/RPMS/x86_64/gtksourceview3-devel*.rpm
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gtksourceview3-3.*.rpm /rpmbuild/RPMS/x86_64/gtksourceview3-devel*.rpm
+
+# libpeas
+
+ADD libpeas.spec /rpmbuild/SOURCES/
+ADD http://ftp.acc.umu.se/pub/gnome/sources/libpeas/1.10/libpeas-1.10.0.tar.xz /rpmbuild/SOURCES/
+RUN rpmbuild -ba /rpmbuild/SOURCES/libpeas.spec
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/libpeas-1.*.rpm /rpmbuild/RPMS/x86_64/libpeas-devel*.rpm
+
+RUN yum install -y enchant-devel iso-codes-devel
 
 ADD gedit.spec /rpmbuild/SOURCES/
 ADD http://ftp.acc.umu.se/pub/gnome/sources/gedit/3.12/gedit-3.12.2.tar.xz /rpmbuild/SOURCES/
-ADD gedit-disable-python3.patch /rpmbuild/SOURCES/
+ADD gedit-broadway.patch /rpmbuild/SOURCES/
 RUN rpmbuild -ba /rpmbuild/SOURCES/gedit.spec
-RUN rpm -Uvh /rpmbuild/RPMS/noarch/gedit-3.*.rpm
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gedit-3.*.rpm
 
+#nautilus
+#gjs
 # script that wraps dbus + broadwayd + HOME, etc
+# simple launcher
 # Minimal runtime container

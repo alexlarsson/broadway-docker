@@ -1,0 +1,56 @@
+diff -up gedit-3.12.2/configure.ac.broadway gedit-3.12.2/configure.ac
+--- gedit-3.12.2/configure.ac.broadway	2014-06-10 19:09:49.355037027 +0200
++++ gedit-3.12.2/configure.ac	2014-06-10 19:21:36.343199730 +0200
+@@ -344,15 +344,8 @@ PKG_CHECK_MODULES(GEDIT, [
+ 	gsettings-desktop-schemas
+ ])
+ 
+-if test "$os_osx" = "no" &&
+-   test "$os_win32" = "no"; then
+-	PKG_CHECK_MODULES(X11, [
+-		x11
+-	])
+-else
+ 	X11_CFLAGS=
+ 	X11_LIBS=
+-fi
+ 
+ if test "$platform_win32" = "no"; then
+ 	PKG_CHECK_MODULES(UNIX, [
+diff -up gedit-3.12.2/gedit/gedit-app-x11.c.broadway gedit-3.12.2/gedit/gedit-app-x11.c
+--- gedit-3.12.2/gedit/gedit-app-x11.c.broadway	2014-06-10 19:20:56.642807382 +0200
++++ gedit-3.12.2/gedit/gedit-app-x11.c	2014-06-10 19:21:17.923481663 +0200
+@@ -24,14 +24,14 @@
+ 
+ #ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#include <X11/Xatom.h>
++#include <X11/Xlib.h>
+ #endif
+ 
+ G_DEFINE_TYPE (GeditAppX11, gedit_app_x11, GEDIT_TYPE_APP)
+ 
+ /* This should go in GtkApplication at some point... */
+ 
+-#include <X11/Xatom.h>
+-#include <X11/Xlib.h>
+ 
+ static void
+ gedit_app_add_platform_data (GApplication    *app,
+@@ -65,6 +65,7 @@ gedit_app_add_platform_data (GApplicatio
+    * "_NET_WM_USER_TIME_WINDOW" one since that's what we're doing
+    * here...
+    */
++#ifdef GDK_WINDOWING_X11
+   if (!g_getenv ("DESKTOP_STARTUP_ID") && g_getenv ("DISPLAY") &&
+       GDK_IS_X11_DISPLAY (gdk_display_get_default ()))
+     {
+@@ -87,6 +88,7 @@ gedit_app_add_platform_data (GApplicatio
+       g_variant_builder_add (builder, "{sv}", "desktop-startup-id", g_variant_new_string (startup_id));
+       g_free (startup_id);
+     }
++#endif
+ }
+ 
+ static void
+diff -up gedit-3.12.2/gedit/gedit.c.broadway gedit-3.12.2/gedit/gedit.c

@@ -1,0 +1,343 @@
+diff -up nautilus-3.12.2/configure.ac.broadway nautilus-3.12.2/configure.ac
+--- nautilus-3.12.2/configure.ac.broadway	2014-06-10 20:51:38.775224836 +0200
++++ nautilus-3.12.2/configure.ac	2014-06-10 20:51:52.022024189 +0200
+@@ -276,7 +276,6 @@ PKG_CHECK_MODULES(COMMON, [
+ 	gail-3.0
+ 	gnome-desktop-3.0 >= gnome_desktop_minver
+ 	libxml-2.0 >= xml_minver
+-	x11
+ ])
+ 
+ dnl additional nautilus libs
+diff -up nautilus-3.12.2/eel/eel-gdk-extensions.c.broadway nautilus-3.12.2/eel/eel-gdk-extensions.c
+--- nautilus-3.12.2/eel/eel-gdk-extensions.c.broadway	2014-06-10 20:55:20.960859037 +0200
++++ nautilus-3.12.2/eel/eel-gdk-extensions.c	2014-06-10 20:57:49.110614312 +0200
+@@ -30,7 +30,9 @@
+ #include "eel-string.h"
+ #include <gdk-pixbuf/gdk-pixbuf.h>
+ #include <gdk/gdk.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <stdlib.h>
+ #include <pango/pango.h>
+ 
+@@ -47,10 +49,11 @@ eel_gdk_parse_geometry (const char *stri
+ 	g_return_val_if_fail (width_return != NULL, EEL_GDK_NO_VALUE);
+ 	g_return_val_if_fail (height_return != NULL, EEL_GDK_NO_VALUE);
+ 
++	gdk_flags = EEL_GDK_NO_VALUE;
++#ifdef GDK_WINDOWING_X11
+ 	x11_flags = XParseGeometry (string, x_return, y_return,
+ 				    width_return, height_return);
+ 
+-	gdk_flags = EEL_GDK_NO_VALUE;
+ 	if (x11_flags & XValue) {
+ 		gdk_flags |= EEL_GDK_X_VALUE;
+ 	}
+@@ -69,6 +72,7 @@ eel_gdk_parse_geometry (const char *stri
+ 	if (x11_flags & YNegative) {
+ 		gdk_flags |= EEL_GDK_Y_NEGATIVE;
+ 	}
++#endif
+ 
+ 	return gdk_flags;
+ }
+diff -up nautilus-3.12.2/eel/eel-gtk-extensions.c.broadway nautilus-3.12.2/eel/eel-gtk-extensions.c
+--- nautilus-3.12.2/eel/eel-gtk-extensions.c.broadway	2014-06-10 20:58:02.035418463 +0200
++++ nautilus-3.12.2/eel/eel-gtk-extensions.c	2014-06-10 21:01:12.089548013 +0200
+@@ -32,11 +32,8 @@
+ #include "eel-gnome-extensions.h"
+ #include "eel-string.h"
+ 
+-#include <X11/Xlib.h>
+-#include <X11/Xatom.h>
+ #include <gdk/gdk.h>
+ #include <gdk/gdkprivate.h>
+-#include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
+ #include <glib/gi18n-lib.h>
+ #include <math.h>
+diff -up nautilus-3.12.2/libnautilus-private/nautilus-canvas-container.c.broadway nautilus-3.12.2/libnautilus-private/nautilus-canvas-container.c
+--- nautilus-3.12.2/libnautilus-private/nautilus-canvas-container.c.broadway	2014-06-10 21:05:41.118484153 +0200
++++ nautilus-3.12.2/libnautilus-private/nautilus-canvas-container.c	2014-06-10 21:07:58.557407456 +0200
+@@ -25,8 +25,10 @@
+ */
+ 
+ #include <config.h>
++#ifdef GDK_WINDOWING_X11
+ #include <X11/Xlib.h>
+ #include <X11/Xatom.h>
++#endif
+ #include <math.h>
+ #include "nautilus-canvas-container.h"
+ 
+@@ -43,7 +45,9 @@
+ 
+ #include <gdk/gdkkeysyms.h>
+ #include <gtk/gtk.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <glib/gi18n.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -2332,6 +2336,7 @@ get_rubber_color (NautilusCanvasContaine
+                   GdkRGBA *bgcolor,
+                   GdkRGBA *bordercolor)
+ {
++#ifdef GDK_WINDOWING_X11
+ 	Atom         real_type;
+ 	gint         result = -1;
+ 	gint         real_format;
+@@ -2385,7 +2390,9 @@ get_rubber_color (NautilusCanvasContaine
+ 		/* Background */
+ 		*bgcolor = read;
+ 		bgcolor->alpha = 0.6;
+-	} else {
++	} else
++#endif
++		{
+ 		/* Fallback to the style context if we can't get the Atom */
+ 		GtkStyleContext *context;
+ 
+diff -up nautilus-3.12.2/libnautilus-private/nautilus-canvas-dnd.c.broadway nautilus-3.12.2/libnautilus-private/nautilus-canvas-dnd.c
+--- nautilus-3.12.2/libnautilus-private/nautilus-canvas-dnd.c.broadway	2014-06-10 21:09:22.395140481 +0200
++++ nautilus-3.12.2/libnautilus-private/nautilus-canvas-dnd.c	2014-06-10 21:09:52.317688251 +0200
+@@ -48,7 +48,6 @@
+ #include <eel/eel-string.h>
+ #include <eel/eel-vfs-extensions.h>
+ #include <gdk/gdkkeysyms.h>
+-#include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
+ #include <glib/gi18n.h>
+ 
+diff -up nautilus-3.12.2/libnautilus-private/nautilus-program-choosing.c.broadway nautilus-3.12.2/libnautilus-private/nautilus-program-choosing.c
+--- nautilus-3.12.2/libnautilus-private/nautilus-program-choosing.c.broadway	2014-06-10 21:15:55.028207518 +0200
++++ nautilus-3.12.2/libnautilus-private/nautilus-program-choosing.c	2014-06-10 21:16:09.486989965 +0200
+@@ -38,7 +38,6 @@
+ #include <stdlib.h>
+ 
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
+ 
+ void
+ nautilus_launch_application_for_mount (GAppInfo *app_info,
+diff -up nautilus-3.12.2/src/nautilus-application.c.broadway nautilus-3.12.2/src/nautilus-application.c
+--- nautilus-3.12.2/src/nautilus-application.c.broadway	2014-06-10 21:18:13.866118255 +0200
++++ nautilus-3.12.2/src/nautilus-application.c	2014-06-10 21:19:36.261878086 +0200
+@@ -68,7 +68,9 @@
+ #include <eel/eel-gtk-extensions.h>
+ #include <eel/eel-stock-dialogs.h>
+ #include <libnotify/notify.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <gtk/gtk.h>
+ 
+ /* Keep window from shrinking down ridiculously small; numbers are somewhat arbitrary */
+@@ -399,12 +401,14 @@ selection_get_cb (GtkWidget          *wi
+ static GtkWidget *
+ get_desktop_manager_selection (GdkScreen *screen)
+ {
++#ifdef GDK_WINDOWING_X11
+ 	char selection_name[32];
+ 	GdkAtom selection_atom;
+ 	Window selection_owner;
+ 	GdkDisplay *display;
+ 	GtkWidget *selection_widget;
+ 
++	
+ 	g_snprintf (selection_name, sizeof (selection_name),
+ 		    "_NET_DESKTOP_MANAGER_S%d", gdk_screen_get_number (screen));
+ 	selection_atom = gdk_atom_intern (selection_name, FALSE);
+@@ -432,6 +436,8 @@ get_desktop_manager_selection (GdkScreen
+ 	}
+ 
+ 	gtk_widget_destroy (selection_widget);
++
++#endif
+ 	
+ 	return NULL;
+ }
+diff -up nautilus-3.12.2/src/nautilus-desktop-canvas-view.c.broadway nautilus-3.12.2/src/nautilus-desktop-canvas-view.c
+--- nautilus-3.12.2/src/nautilus-desktop-canvas-view.c.broadway	2014-06-10 21:10:27.065163078 +0200
++++ nautilus-3.12.2/src/nautilus-desktop-canvas-view.c	2014-06-10 21:12:16.255512623 +0200
+@@ -31,13 +31,17 @@
+ #include "nautilus-canvas-view-container.h"
+ #include "nautilus-view.h"
+ 
++#ifdef GDK_WINDOWING_X11
+ #include <X11/Xatom.h>
++#endif
+ #include <gtk/gtk.h>
+ #include <eel/eel-glib-extensions.h>
+ #include <eel/eel-gtk-extensions.h>
+ #include <eel/eel-vfs-extensions.h>
+ #include <fcntl.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <glib/gi18n.h>
+ #include <libnautilus-private/nautilus-desktop-icon-file.h>
+ #include <libnautilus-private/nautilus-directory-notify.h>
+@@ -124,6 +128,7 @@ canvas_container_set_workarea (NautilusC
+ 					     left, right, top, bottom);
+ }
+ 
++#ifdef GDK_WINDOWING_X11
+ static void
+ net_workarea_changed (NautilusDesktopCanvasView *canvas_view,
+ 		      GdkWindow         *window)
+@@ -228,6 +233,7 @@ desktop_canvas_view_property_filter (Gdk
+ 
+ 	return GDK_FILTER_CONTINUE;
+ }
++#endif
+ 
+ static const char *
+ real_get_id (NautilusView *view)
+@@ -291,9 +297,11 @@ unrealized_callback (GtkWidget *widget,
+ 	g_return_if_fail (desktop_canvas_view->details->root_window != NULL);
+ 
+ 	/* Remove the property filter */
++#ifdef GDK_WINDOWING_X11
+ 	gdk_window_remove_filter (desktop_canvas_view->details->root_window,
+ 				  desktop_canvas_view_property_filter,
+ 				  desktop_canvas_view);
++#endif
+ 	desktop_canvas_view->details->root_window = NULL;
+ }
+ 
+@@ -310,6 +318,7 @@ realized_callback (GtkWidget *widget, Na
+ 
+ 	desktop_canvas_view->details->root_window = root_window;
+ 
++#ifdef GDK_WINDOWING_X11
+ 	/* Read out the workarea geometry and update the icon container accordingly */
+ 	net_workarea_changed (desktop_canvas_view, root_window);
+ 
+@@ -318,6 +327,7 @@ realized_callback (GtkWidget *widget, Na
+ 	gdk_window_add_filter (root_window,
+ 			       desktop_canvas_view_property_filter,
+ 			       desktop_canvas_view);
++#endif
+ }
+ 
+ static void
+diff -up nautilus-3.12.2/src/nautilus-desktop-window.c.broadway nautilus-3.12.2/src/nautilus-desktop-window.c
+--- nautilus-3.12.2/src/nautilus-desktop-window.c.broadway	2014-06-10 21:21:54.070803455 +0200
++++ nautilus-3.12.2/src/nautilus-desktop-window.c	2014-06-10 21:22:42.918067966 +0200
+@@ -26,8 +26,10 @@
+ #include "nautilus-window-private.h"
+ #include "nautilus-actions.h"
+ 
++#ifdef GDK_WINDOWING_X11
+ #include <X11/Xatom.h>
+ #include <gdk/gdkx.h>
++#endif
+ #include <gtk/gtk.h>
+ #include <gio/gio.h>
+ #include <glib/gi18n.h>
+@@ -202,13 +204,14 @@ static void
+ set_wmspec_desktop_hint (GdkWindow *window)
+ {
+ 	GdkAtom atom;
+-
++#ifdef GDK_WINDOWING_X11
+ 	atom = gdk_atom_intern ("_NET_WM_WINDOW_TYPE_DESKTOP", FALSE);
+         
+ 	gdk_property_change (window,
+ 			     gdk_atom_intern ("_NET_WM_WINDOW_TYPE", FALSE),
+ 			     gdk_x11_xatom_to_atom (XA_ATOM), 32,
+ 			     GDK_PROP_MODE_REPLACE, (guchar *) &atom, 1);
++#endif
+ }
+ 
+ static void
+diff -up nautilus-3.12.2/src/nautilus-mime-actions.c.broadway nautilus-3.12.2/src/nautilus-mime-actions.c
+--- nautilus-3.12.2/src/nautilus-mime-actions.c.broadway	2014-06-10 21:23:16.712559088 +0200
++++ nautilus-3.12.2/src/nautilus-mime-actions.c	2014-06-10 21:28:51.462516840 +0200
+@@ -33,7 +33,6 @@
+ #include <glib/gi18n.h>
+ #include <glib/gstdio.h>
+ #include <string.h>
+-#include <gdk/gdkx.h>
+ 
+ #include <libnautilus-private/nautilus-file-attributes.h>
+ #include <libnautilus-private/nautilus-file.h>
+@@ -1307,11 +1306,13 @@ search_for_application_mime_type (Activa
+ 
+ 	g_assert (parameters_install->proxy != NULL);	
+ 
++#ifdef GDK_WINDOWING_X11
+ 	/* get XID from parent window */
+ 	window = gtk_widget_get_window (GTK_WIDGET (parameters_install->parent_window));
+ 	if (window != NULL) {
+ 		xid = GDK_WINDOW_XID (window);
+ 	}
++#endif
+ 
+ 	mime_types[0] = mime_type;
+ 	mime_types[1] = NULL;
+diff -up nautilus-3.12.2/src/nautilus-shell-search-provider.c.broadway nautilus-3.12.2/src/nautilus-shell-search-provider.c
+--- nautilus-3.12.2/src/nautilus-shell-search-provider.c.broadway	2014-06-10 21:23:39.677213268 +0200
++++ nautilus-3.12.2/src/nautilus-shell-search-provider.c	2014-06-10 21:23:43.617153937 +0200
+@@ -26,7 +26,6 @@
+ #include <gio/gio.h>
+ #include <string.h>
+ #include <glib/gi18n.h>
+-#include <gdk/gdkx.h>
+ 
+ #include <libnautilus-private/nautilus-file.h>
+ #include <libnautilus-private/nautilus-file-utilities.h>
+diff -up nautilus-3.12.2/src/nautilus-view.c.broadway nautilus-3.12.2/src/nautilus-view.c
+--- nautilus-3.12.2/src/nautilus-view.c.broadway	2014-06-10 21:24:02.416870824 +0200
++++ nautilus-3.12.2/src/nautilus-view.c	2014-06-10 21:24:33.267406214 +0200
+@@ -41,7 +41,9 @@
+ #include "nautilus-empty-view.h"
+ #endif
+ 
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <gdk/gdkkeysyms.h>
+ #include <gtk/gtk.h>
+ #include <glib/gi18n.h>
+@@ -1043,8 +1045,10 @@ nautilus_view_preview_files (NautilusVie
+ 	uri = nautilus_file_get_uri (files->data);
+ 	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (view));
+ 
++#ifdef GDK_WINDOWING_X11
+ 	xid = gdk_x11_window_get_xid (gtk_widget_get_window (toplevel));
+ 	nautilus_previewer_call_show_file (previewer, uri, xid, TRUE);
++#endif
+ 
+ 	g_free (uri);
+ }
+diff -up nautilus-3.12.2/src/nautilus-window.c.broadway nautilus-3.12.2/src/nautilus-window.c
+--- nautilus-3.12.2/src/nautilus-window.c.broadway	2014-06-10 21:24:55.870065801 +0200
++++ nautilus-3.12.2/src/nautilus-window.c	2014-06-10 21:25:45.873312669 +0200
+@@ -48,7 +48,9 @@
+ #include <eel/eel-gtk-extensions.h>
+ #include <eel/eel-stock-dialogs.h>
+ #include <gdk-pixbuf/gdk-pixbuf.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <gdk/gdkkeysyms.h>
+ #include <gtk/gtk.h>
+ #include <glib/gi18n.h>
+@@ -767,7 +769,12 @@ format_cb (GtkMenuItem *item,
+ 	g_assert (volume != NULL && G_IS_VOLUME (volume));
+ 
+ 	device_identifier = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
++
++#ifdef GDK_WINDOWING_X11
+ 	xid = (gint) gdk_x11_window_get_xid (gtk_widget_get_window (GTK_WIDGET (window)));
++#else
++	xid = 0;
++#endif
+ 	xid_string = g_strdup_printf ("%d", xid);
+ 
+ 	cmdline = g_strconcat ("gnome-disks ",

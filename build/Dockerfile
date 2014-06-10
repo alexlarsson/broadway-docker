@@ -114,8 +114,35 @@ ADD gedit-broadway.patch /rpmbuild/SOURCES/
 RUN rpmbuild -ba /rpmbuild/SOURCES/gedit.spec
 RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gedit-3.*.rpm
 
+RUN yum install -y mozjs24-devel readline-devel dbus-glib-devel gcc-c++
+
+ADD gjs.spec /rpmbuild/SOURCES/
+ADD http://ftp.acc.umu.se/pub/gnome/sources/gjs/1.40/gjs-1.40.1.tar.xz /rpmbuild/SOURCES/
+RUN rpmbuild -ba /rpmbuild/SOURCES/gjs.spec
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gjs-1.*.rpm /rpmbuild/RPMS/x86_64/gjs-devel*.rpm
+
+ADD gnome-desktop3.spec /rpmbuild/SOURCES/
+ADD http://ftp.acc.umu.se/pub/gnome/sources/gnome-desktop/3.12/gnome-desktop-3.12.2.tar.xz /rpmbuild/SOURCES/
+ADD gnome-desktop-broadway.patch /rpmbuild/SOURCES/
+RUN rpmbuild -ba /rpmbuild/SOURCES/gnome-desktop3.spec
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/gnome-desktop3-3.*.x86_64.rpm /rpmbuild/RPMS/x86_64/gnome-desktop3-devel-3.*.x86_64.rpm
+
+RUN yum install -y libexif-devel exempi-devel
+
+ADD libnotify.spec /rpmbuild/SOURCES/
+ADD http://ftp.acc.umu.se/pub/gnome/sources/libnotify/0.7/libnotify-0.7.6.tar.xz /rpmbuild/SOURCES/
+RUN rpmbuild -ba /rpmbuild/SOURCES/libnotify.spec
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/libnotify-0.*.x86_64.rpm /rpmbuild/RPMS/x86_64/libnotify-devel*.x86_64.rpm
+
+ADD nautilus.spec /rpmbuild/SOURCES/
+ADD http://ftp.acc.umu.se/pub/gnome/sources/nautilus/3.12/nautilus-3.12.2.tar.xz /rpmbuild/SOURCES/
+ADD nautilus-broadway.patch /rpmbuild/SOURCES/
+RUN rpmbuild -ba /rpmbuild/SOURCES/nautilus.spec
+RUN rpm -Uvh /rpmbuild/RPMS/x86_64/nautilus-3.*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-extensions*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-devel-3.*.x86_64.rpm
+
+
 #nautilus
-#gjs
+#gvfs?
 # script that wraps dbus + broadwayd + HOME, etc
 # simple launcher
 # Minimal runtime container

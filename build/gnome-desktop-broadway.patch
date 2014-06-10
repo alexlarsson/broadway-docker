@@ -1,0 +1,116 @@
+diff -up gnome-desktop-3.12.2/configure.ac.broadway gnome-desktop-3.12.2/configure.ac
+--- gnome-desktop-3.12.2/configure.ac.broadway	2014-06-10 20:16:08.310327104 +0200
++++ gnome-desktop-3.12.2/configure.ac	2014-06-10 20:22:50.311215296 +0200
+@@ -129,16 +129,9 @@ AC_SUBST(LIBM)
+ 
+ dnl we need x11 for GnomeBG
+ 
+-PKG_CHECK_MODULES(XLIB, x11,
+-    X11_PACKAGE=x11,
+-    [X11_PACKAGE=
+-     AC_PATH_XTRA
+-     if test "x$no_x" = xyes; then
+-       AC_MSG_ERROR("no (requires X development libraries)")
+-     else
+-       XLIB_LIBS="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
+-       XLIB_CFLAGS=$X_CFLAGS
+-     fi])
++X11_PACKAGE=x11,
++XLIB_LIBS=
++XLIB_CFLAGS=
+ AC_SUBST(X11_PACKAGE)
+ AC_SUBST(XLIB_CFLAGS)
+ AC_SUBST(XLIB_LIBS)
+@@ -150,9 +143,6 @@ PKG_CHECK_MODULES(GNOME_DESKTOP, gdk-pix
+                                  glib-2.0 >= $GLIB_REQUIRED
+                                  gio-2.0 >= $GLIB_REQUIRED
+                                  gsettings-desktop-schemas >= $GSETTINGS_DESKTOP_SCHEMAS_REQUIRED
+-                                 xrandr >= $XRANDR_REQUIRED
+-                                 xext >= $XEXT_REQUIRED
+-                                 xkeyboard-config
+                                  iso-codes)
+ 
+ XKB_BASE=$($PKG_CONFIG --variable xkb_base xkeyboard-config)
+diff -up gnome-desktop-3.12.2/libgnome-desktop/gnome-bg.c.broadway gnome-desktop-3.12.2/libgnome-desktop/gnome-bg.c
+diff -up gnome-desktop-3.12.2/libgnome-desktop/Makefile.am.broadway gnome-desktop-3.12.2/libgnome-desktop/Makefile.am
+--- gnome-desktop-3.12.2/libgnome-desktop/Makefile.am.broadway	2014-06-10 20:19:35.650175237 +0200
++++ gnome-desktop-3.12.2/libgnome-desktop/Makefile.am	2014-06-10 20:33:05.066022468 +0200
+@@ -29,18 +29,9 @@ noinst_LTLIBRARIES += libgsystem.la
+ introspection_sources = 		\
+ 	gnome-desktop-thumbnail.c 	\
+ 	gnome-thumbnail-pixbuf-utils.c 	\
+-	gnome-bg.c			\
+-	gnome-bg-slide-show.c		\
+-	gnome-bg-crossfade.c		\
+-	gnome-rr.c			\
+-	gnome-rr-config.c		\
+-	gnome-rr-output-info.c		\
+ 	gnome-pnp-ids.c			\
+ 	gnome-wall-clock.c		\
+-	gnome-xkb-info.c		\
+-	gnome-idle-monitor.c		\
+-	gnome-languages.c		\
+-	edid-parse.c
++	gnome-languages.c
+ 
+ libgnome_desktop_3_la_SOURCES = 	\
+ 	$(introspection_sources)	\
+@@ -48,9 +39,7 @@ libgnome_desktop_3_la_SOURCES = 	\
+ 	$(dbus_idle_built_sources)	\
+ 	gnome-datetime-source.h		\
+ 	gnome-datetime-source.c		\
+-	gnome-rr-private.h		\
+ 	default-input-sources.h		\
+-	edid.h				\
+ 	meta-xrandr-shared.h
+ 
+ dbus_xrandr_built_sources = meta-dbus-xrandr.c meta-dbus-xrandr.h
+@@ -91,16 +80,9 @@ pkgconfig_DATA = gnome-desktop-3.0.pc
+ 
+ libgnome_desktopdir = $(includedir)/gnome-desktop-3.0/libgnome-desktop
+ libgnome_desktop_HEADERS = \
+-        gnome-bg.h                      \
+-        gnome-bg-crossfade.h            \
+-	gnome-bg-slide-show.h		\
+         gnome-desktop-thumbnail.h       \
+-        gnome-rr.h                      \
+-        gnome-rr-config.h               \
+         gnome-pnp-ids.h			\
+         gnome-wall-clock.h		\
+-	gnome-xkb-info.h		\
+-	gnome-idle-monitor.h		\
+ 	gnome-languages.h
+ 
+ if USE_INTERNAL_PNP_IDS
+@@ -152,30 +134,15 @@ EXTRA_DIST = \
+ MAINTAINERCLEANFILES = \
+ 	pnp.ids
+ 
+-libexec_PROGRAMS =		\
+-	gnome-rr-debug
+-
+-gnome_rr_debug_SOURCES =	\
+-	gnome-rr-debug.c
+-
+-gnome_rr_debug_LDADD =		\
+-	$(GNOME_DESKTOP_LIBS)	\
+-	$(lib_LTLIBRARIES)	\
+-	$(XLIB_LIBS)
+-
+-noinst_PROGRAMS = test-xkb-info test-pnp-ids test-wall-clock test-desktop-thumbnail test-idle-monitor test-languages
++noinst_PROGRAMS =  test-wall-clock test-desktop-thumbnail test-languages
+ test_xkb_info_LDADD =		\
+ 	$(GNOME_DESKTOP_LIBS)	\
+ 	$(lib_LTLIBRARIES)
+ 
+-test_pnp_ids_LDADD = $(test_xkb_info_LDADD)
+-
+ test_wall_clock_LDADD = $(test_xkb_info_LDADD)
+ 
+ test_desktop_thumbnail_LDADD = $(test_xkb_info_LDADD)
+ 
+-test_idle_monitor_LDADD = $(test_xkb_info_LDADD)
+-
+ test_languages_LDADD = $(test_xkb_info_LDADD)
+ 
+ -include $(top_srcdir)/git.mk

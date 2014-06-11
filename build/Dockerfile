@@ -140,9 +140,6 @@ ADD nautilus-broadway.patch /rpmbuild/SOURCES/
 RUN rpmbuild -ba /rpmbuild/SOURCES/nautilus.spec
 RUN rpm -Uvh /rpmbuild/RPMS/x86_64/nautilus-3.*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-extensions*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-devel-3.*.x86_64.rpm
 
-
-#nautilus
-#gvfs?
-# script that wraps dbus + broadwayd + HOME, etc
-# simple launcher
-# Minimal runtime container
+ADD init.sh /
+ENTRYPOINT /init.sh
+ADD panel.js /

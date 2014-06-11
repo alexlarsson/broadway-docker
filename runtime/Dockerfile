@@ -9,13 +9,11 @@ RUN yum -y --disablerepo=* --enablerepo=broadway install glib2 gtk3 && yum clean
 RUN yum -y install librsvg2 && yum clean all
 RUN yum -y --disablerepo=*  --enablerepo=broadway install gnome-icon-theme gnome-icon-theme-symbolic gnome-themes-standard vte3 dconf gsettings-desktop-schemas gnome-terminal gedit nautilus gjs && yum clean all
 
-RUN bash -c "echo user:x:1000:10:User:/home/user:/bin/bash >> /etc/passwd"
-RUN mkdir -p /home/user/.config
-RUN chown 1000.1000 /home/user /home/user/.config
+RUN adduser user -c User -d /home/user -m -s /bin/bash -u 1000 -U
 
 ADD init.sh /
 ADD panel.js /
 
-ENTRYPOINT /init.sh
+CMD ["/init.sh"]
 USER 1000
 WORKDIR /home/user

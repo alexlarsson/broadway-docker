@@ -140,6 +140,13 @@ ADD nautilus-broadway.patch /rpmbuild/SOURCES/
 RUN rpmbuild -ba /rpmbuild/SOURCES/nautilus.spec
 RUN rpm -Uvh /rpmbuild/RPMS/x86_64/nautilus-3.*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-extensions*.x86_64.rpm /rpmbuild/RPMS/x86_64/nautilus-devel-3.*.x86_64.rpm
 
-ADD init.sh /
-ENTRYPOINT /init.sh
-ADD panel.js /
+RUN yum install -y createrepo lighttpd
+
+RUN mkdir -p /repo
+RUN cp /rpmbuild/RPMS/noarch/* /rpmbuild/RPMS/x86_64/* /repo
+RUN createrepo /repo
+
+ADD http.conf /
+EXPOSE 80
+
+CMD ["/usr/sbin/lighttpd","-D","-f", "/http.conf"]

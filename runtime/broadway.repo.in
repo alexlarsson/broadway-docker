@@ -1,6 +1,6 @@
 [broadway]
 name=Broadway
-baseurl=http://172.31.0.10:9999
+baseurl=http://%%IP%%:9999
 enabled=1
 gpgcheck=0
 cost=1000

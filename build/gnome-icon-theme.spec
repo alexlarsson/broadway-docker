@@ -96,11 +96,11 @@ touch --no-create %{_datadir}/icons/gnome &>/dev/null || :
 %postun
 if [ $1 -eq 0 ] ; then
     touch --no-create %{_datadir}/icons/gnome &>/dev/null
-    gtk-update-icon-cache %{_datadir}/icons/gnome &>/dev/null || :
+    gtk-update-icon-cache -i %{_datadir}/icons/gnome &>/dev/null || :
 fi
 
 %posttrans
-gtk-update-icon-cache %{_datadir}/icons/gnome &>/dev/null || :
+gtk-update-icon-cache -i %{_datadir}/icons/gnome &>/dev/null || :
 
 %post legacy
 touch --no-create %{_datadir}/icons/gnome &>/dev/null || :
@@ -108,11 +108,11 @@ touch --no-create %{_datadir}/icons/gnome &>/dev/null || :
 %postun legacy
 if [ $1 -eq 0 ] ; then
     touch --no-create %{_datadir}/icons/gnome &>/dev/null
-    gtk-update-icon-cache %{_datadir}/icons/gnome &>/dev/null || :
+    gtk-update-icon-cache -i %{_datadir}/icons/gnome &>/dev/null || :
 fi
 
 %posttrans legacy
-gtk-update-icon-cache %{_datadir}/icons/gnome &>/dev/null || :
+gtk-update-icon-cache -i %{_datadir}/icons/gnome &>/dev/null || :
 
 %files -f files.txt
 %doc COPYING AUTHORS

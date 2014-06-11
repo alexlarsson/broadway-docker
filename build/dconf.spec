@@ -84,7 +84,7 @@ if [ $1 -eq 0 ] ; then
 
   for d in hicolor HighContrast ; do
     touch --no-create %{_datadir}/icons/$d &>/dev/null || :
-    gtk-update-icon-cache %{_datadir}/icons/$d &>/dev/null || :
+    gtk-update-icon-cache -i %{_datadir}/icons/$d &>/dev/null || :
   done
 fi
 
@@ -92,7 +92,7 @@ fi
 glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
 for d in hicolor HighContrast ; do
-  gtk-update-icon-cache %{_datadir}/icons/$d &>/dev/null || :
+  gtk-update-icon-cache -i %{_datadir}/icons/$d &>/dev/null || :
 done
 
 

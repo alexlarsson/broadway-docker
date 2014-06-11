@@ -76,7 +76,7 @@ done
 
 %posttrans
 for t in HighContrast; do
-  gtk-update-icon-cache %{_datadir}/icons/$t &>/dev/null || :
+  gtk-update-icon-cache -i %{_datadir}/icons/$t &>/dev/null || :
 done
 
 %files

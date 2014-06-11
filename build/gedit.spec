@@ -111,12 +111,12 @@ touch --no-create %{_datadir}/icons/hicolor >&/dev/null || :
 update-desktop-database >&/dev/null || :
 if [ $1 -eq 0 ]; then
   touch --no-create %{_datadir}/icons/hicolor >&/dev/null || :
-  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
+  gtk-update-icon-cache -i %{_datadir}/icons/hicolor >&/dev/null || :
   glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 fi
 
 %posttrans
-gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null || :
+gtk-update-icon-cache -i %{_datadir}/icons/hicolor >&/dev/null || :
 glib-compile-schemas %{_datadir}/glib-2.0/schemas >&/dev/null || :
 
 %files -f %{name}.lang

@@ -7,5 +7,6 @@ export LC_TIME="en_US.utf8"
 export DBUS_SESSION_BUS_ADDRESS=`dbus-daemon --session --print-address --fork`
 export XDG_CURRENT_DESKTOP=GNOME
 export XDG_MENU_PREFIX="gnome-"
+export HOME=/home/user
 broadwayd&
 exec /panel.js

@@ -9,6 +9,9 @@ RUN yum -y --disablerepo=* --enablerepo=broadway install glib2 gtk3 && yum clean
 RUN yum -y install librsvg2 && yum clean all
 RUN yum -y --disablerepo=*  --enablerepo=broadway install gnome-icon-theme gnome-icon-theme-symbolic gnome-themes-standard vte3 dconf gsettings-desktop-schemas gnome-terminal gedit nautilus gjs && yum clean all
 
+RUN mkdir -p /home/user
+WORKDIR /home/user
+
 ADD init.sh /
 ENTRYPOINT /init.sh
 ADD panel.js /

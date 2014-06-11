@@ -43,6 +43,7 @@ Requires:       libexif%{_isa} >= %{libexif_version}
 # the main binary links against libnautilus-extension.so
 # don't depend on soname, rather on exact version
 Requires:       nautilus-extensions = %{version}-%{release}
+Requires:       gvfs
 
 %description
 Nautilus is the file manager and graphical shell for the GNOME desktop

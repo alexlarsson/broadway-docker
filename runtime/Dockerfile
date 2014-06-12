@@ -10,6 +10,8 @@ RUN yum -y --disablerepo=* --enablerepo=broadway install glib2 gtk3 librsvg2 gno
 RUN adduser user -c User -d /home/user -m -s /bin/bash -u 1000 -U
 RUN mkdir -p /home/user/.config && chown 1000.1000 /home/user/.config
 
+RUN echo "user ALL=(root) NOPASSWD: ALL" >> /etc/sudoers
+
 ADD init.sh /
 ADD panel.js /
 
